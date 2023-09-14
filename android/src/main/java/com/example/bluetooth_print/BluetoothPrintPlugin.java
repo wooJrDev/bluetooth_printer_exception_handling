@@ -360,8 +360,12 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
   private boolean disconnect(){
     DeviceConnFactoryManager deviceConnFactoryManager = DeviceConnFactoryManager.getDeviceConnFactoryManagers().get(curMacAddress);
     if(deviceConnFactoryManager != null && deviceConnFactoryManager.mPort != null) {
-      if(deviceConnFactoryManager.reader != null){
-        deviceConnFactoryManager.reader.cancel();
+      try{
+        if(deviceConnFactoryManager.reader != null){
+          deviceConnFactoryManager.reader.cancel();
+        }
+      } finally {
+
       }
       deviceConnFactoryManager.closePort();
       deviceConnFactoryManager.mPort = null;
