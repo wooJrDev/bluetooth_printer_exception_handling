@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * BluetoothPrintPlugin
@@ -358,14 +359,21 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
    * 关闭连接
    */
   private boolean disconnect(){
-    DeviceConnFactoryManager deviceConnFactoryManager = DeviceConnFactoryManager.getDeviceConnFactoryManagers().get(curMacAddress);
+    final DeviceConnFactoryManager deviceConnFactoryManager = DeviceConnFactoryManager.getDeviceConnFactoryManagers().get(curMacAddress);
     if(deviceConnFactoryManager != null && deviceConnFactoryManager.mPort != null) {
       try{
-        if(deviceConnFactoryManager.reader != null){
-          deviceConnFactoryManager.reader.cancel();
-        }
-      } finally {
-
+        new Thread(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    if(deviceConnFactoryManager.reader != null){
+                      deviceConnFactoryManager.reader.cancel();
+                    }
+                  }
+                }
+        ).start();
+      } catch (Exception e) {
+        Log.d("cancel", e.toString());
       }
       deviceConnFactoryManager.closePort();
       deviceConnFactoryManager.mPort = null;
