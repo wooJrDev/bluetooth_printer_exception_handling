@@ -166,7 +166,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
   @Override
   public void onMethodCall(MethodCall call, Result result) {
     if (mBluetoothAdapter == null && !"isAvailable".equals(call.method)) {
-      result.error("bluetooth_unavailable", "the device does not have bluetooth", null);
+      result.error("bluetooth_unavailable", "Your device does not have Bluetooth capabilities. Please ensure that Bluetooth is enabled on your device and try again.", null);
       return;
     }
 
@@ -181,7 +181,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
         result.success(mBluetoothAdapter.isEnabled());
         break;
       case "isConnected":
-        result.success(threadPool != null);
+        result.success(DeviceConnFactoryManager.getDeviceConnFactoryManagers().get(curMacAddress) != null  && threadPool != null);
         break;
       case "startScan":
       {
@@ -259,7 +259,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
           break;
       }
     } catch (SecurityException e) {
-      result.error("invalid_argument", "argument 'address' not found", null);
+      result.error("invalid_argument", "Unable to retrieve Bluetooth state. Please check if the connected Bluetooth device is functioning correctly and properly connected, then try again.", null);
     }
 
   }
@@ -272,7 +272,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
       startScan();
       result.success(null);
     } catch (Exception e) {
-      result.error("startScan", e.getMessage(), e);
+      result.error("startScan", null, e);
     }
   }
 
@@ -305,7 +305,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
   private void startScan() throws IllegalStateException {
     BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
     if(scanner == null) {
-      throw new IllegalStateException("getBluetoothLeScanner() is null. Is the Adapter on?");
+      throw new IllegalStateException("Bluetooth scanning is not available on this device. Please make sure that your Bluetooth is turned on and try again.");
     }
 
     // 0:lowPower 1:balanced 2:lowLatency -1:opportunistic
@@ -349,7 +349,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
 
       result.success(true);
     } else {
-      result.error("******************* invalid_argument", "argument 'address' not found", null);
+      result.error("******************* invalid_argument", "Unable to retrieve Bluetooth state. Please check if the connected Bluetooth device is functioning correctly and properly connected, then try again.", null);
     }
 
   }
@@ -380,7 +380,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
   private void printTest(Result result) {
     final DeviceConnFactoryManager deviceConnFactoryManager = DeviceConnFactoryManager.getDeviceConnFactoryManagers().get(curMacAddress);
     if (deviceConnFactoryManager == null || !deviceConnFactoryManager.getConnState()) {
-      result.error("not connect", "state not right", null);
+      result.error("not connect", "Please ensure that the device is properly connected and supports printing, then try again.", null);
     }
 
     threadPool = ThreadPool.getInstantiation();
@@ -408,7 +408,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
 
     final DeviceConnFactoryManager deviceConnFactoryManager = DeviceConnFactoryManager.getDeviceConnFactoryManagers().get(curMacAddress);
     if (deviceConnFactoryManager == null || !deviceConnFactoryManager.getConnState()) {
-      result.error("not connect", "state not right", null);
+      result.error("not connect", "Please ensure that the device is properly connected and supports printing, then try again.", null);
     }
 
     if (args != null && args.containsKey("config") && args.containsKey("data")) {
@@ -435,7 +435,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
         }
       });
     }else{
-      result.error("please add config or data", "", null);
+      result.error("please add config or data", "Sorry, the PDF format is not supported for printing.", null);
     }
 
   }
@@ -447,7 +447,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
       if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         startScan(pendingCall, pendingResult);
       } else {
-        pendingResult.error("no_permissions", "this plugin requires location permissions for scanning", null);
+        pendingResult.error("no_permissions", "This app requires location permissions to perform scanning. Please grant the necessary permissions in your device settings to enable scanning functionality.", null);
         pendingResult = null;
       }
       return true;

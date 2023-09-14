@@ -10,7 +10,7 @@ BluetoothPrint is a bluetooth plugin for [Flutter](https://flutter.dev), a new m
 [ ] set paper size  
 [ ] more print examples
 
-### verison
+### version
 4.0.0（flutter 3.x）    
 3.0.0（flutter 2.x）      
 2.0.0（flutter 1.12）       
@@ -18,17 +18,17 @@ BluetoothPrint is a bluetooth plugin for [Flutter](https://flutter.dev), a new m
 
 ## Features
 
-|                         |      Android       |         iOS          |             Description            |
-| :---------------        | :----------------: | :------------------: |  :-------------------------------- |
-| scan                    | :white_check_mark: |  :white_check_mark:  | Starts a scan for Bluetooth Low Energy devices. |
-| connect                 | :white_check_mark: |  :white_check_mark:  | Establishes a connection to the device. |
-| disconnect              | :white_check_mark: |  :white_check_mark:  | Cancels an active or pending connection to the device. |
-| state                   | :white_check_mark: |  :white_check_mark:  | Stream of state changes for the Bluetooth Device. |
-| print test message      | :white_check_mark: |  :white_check_mark:  | print device test message. |
-| print text              | :white_check_mark: |  :white_check_mark:  | print custom text, support layout. |
-| print image             | :white_check_mark: |  :white_check_mark:  | print image. |
-| print qrcode            | :white_check_mark: |  :white_check_mark:  | print qrcode,support change size. |
-| print barcode           | :white_check_mark: |  :white_check_mark:  | print barcode |
+|                    |      Android       |        iOS         | Description                                            |
+|:-------------------|:------------------:|:------------------:|:-------------------------------------------------------|
+| scan               | :white_check_mark: | :white_check_mark: | Starts a scan for Bluetooth Low Energy devices.        |
+| connect            | :white_check_mark: | :white_check_mark: | Establishes a connection to the device.                |
+| disconnect         | :white_check_mark: | :white_check_mark: | Cancels an active or pending connection to the device. |
+| state              | :white_check_mark: | :white_check_mark: | Stream of state changes for the Bluetooth Device.      |
+| print test message | :white_check_mark: | :white_check_mark: | print device test message.                             |
+| print text         | :white_check_mark: | :white_check_mark: | print custom text, support layout.                     |
+| print image        | :white_check_mark: | :white_check_mark: | print image.                                           |
+| print qrcode       | :white_check_mark: | :white_check_mark: | print qrcode,support change size.                      |
+| print barcode      | :white_check_mark: | :white_check_mark: | print barcode                                          |
 
 
 ## Usage
@@ -155,8 +155,8 @@ A new flutter plugin project.
     Map<String, dynamic> config = Map();
     List<LineText> list = List();
     list.add(LineText(type: LineText.TYPE_TEXT, content: 'A Title', weight: 1, align: LineText.ALIGN_CENTER,linefeed: 1));
-    list.add(LineText(type: LineText.TYPE_TEXT, content: 'this is conent left', weight: 0, align: LineText.ALIGN_LEFT,linefeed: 1));
-    list.add(LineText(type: LineText.TYPE_TEXT, content: 'this is conent right', align: LineText.ALIGN_RIGHT,linefeed: 1));
+    list.add(LineText(type: LineText.TYPE_TEXT, content: 'this is content left', weight: 0, align: LineText.ALIGN_LEFT,linefeed: 1));
+    list.add(LineText(type: LineText.TYPE_TEXT, content: 'this is content right', align: LineText.ALIGN_RIGHT,linefeed: 1));
     list.add(LineText(linefeed: 1));
     list.add(LineText(type: LineText.TYPE_BARCODE, content: 'A12312112', size:10, align: LineText.ALIGN_CENTER, linefeed: 1));
     list.add(LineText(linefeed: 1));
