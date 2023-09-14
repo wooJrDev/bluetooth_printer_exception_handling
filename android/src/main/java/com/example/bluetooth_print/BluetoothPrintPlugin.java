@@ -279,6 +279,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
 
   private void invokeMethodUIThread(final String name, final BluetoothDevice device)
   {
+    if(device == null) return;
     final Map<String, Object> ret = new HashMap<>();
     ret.put("address", device.getAddress());
     ret.put("name", device.getName());
