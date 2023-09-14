@@ -459,11 +459,13 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
   public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
     if (requestCode == REQUEST_FINE_LOCATION_PERMISSIONS) {
-      if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        startScan(pendingCall, pendingResult);
-      } else {
-        pendingResult.error("no_permissions", "This app requires location permissions to perform scanning. Please grant the necessary permissions in your device settings to enable scanning functionality.", null);
-        pendingResult = null;
+      if(grantResults.length >= 1){
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+          startScan(pendingCall, pendingResult);
+        } else {
+          pendingResult.error("no_permissions", "This app requires location permissions to perform scanning. Please grant the necessary permissions in your device settings to enable scanning functionality.", null);
+          pendingResult = null;
+        }
       }
       return true;
     }
