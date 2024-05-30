@@ -1,6 +1,9 @@
 //
 //  ConnecterManager.h
-//  GSDK
+//  GPSDKDemo
+//
+//  Created by max on 2020/7/22.
+//  Copyright © 2020 max. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -19,11 +22,34 @@ typedef enum : NSUInteger{
     ETHERNET
 }ConnectMethod;
 
+/**
+ *  @enum CommandType
+ *  @discussion 指令类型
+ *  @constant UNKNOWN 未知
+ *  @constant ESC 票据模式
+ *  @constant TSC 标签模式
+ */
+typedef enum :NSUInteger{
+    UNKNOWN,
+    ESC,
+    TSC,
+    CPCL
+}CommandType;
+
 #define Manager [ConnecterManager sharedInstance]
 
 @interface ConnecterManager : NSObject
 @property(nonatomic,strong)BLEConnecter *bleConnecter;
+@property(nonatomic,strong)EthernetConnecter *ethernetConnecter;
 @property(nonatomic,strong)Connecter *connecter;
+@property(nonatomic,assign)BOOL isConnected;
+@property(nonatomic,copy)ConnectDeviceState state;
+@property(nonatomic,strong)NSString *UUIDString;
+
+@property(nonatomic,assign)ConnectMethod currentConnMethod;
+@property(nonatomic,assign)CommandType type;
+@property(nonatomic,copy)UpdateState updateCenterBluetoothState;
+@property(nonatomic,strong)CBPeripheral *peripheral;
 
 +(instancetype)sharedInstance;
 
@@ -86,8 +112,5 @@ typedef enum : NSUInteger{
  *  @param discover 发现的设备
  */
 -(void)scanForPeripheralsWithServices:(nullable NSArray<CBUUID *> *)serviceUUIDs options:(nullable NSDictionary<NSString *, id> *)options discover:(void(^_Nullable)(CBPeripheral *_Nullable peripheral,NSDictionary<NSString *, id> *_Nullable advertisementData,NSNumber *_Nullable RSSI))discover;
-
-
-
 
 @end

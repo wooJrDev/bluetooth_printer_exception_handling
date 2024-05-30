@@ -1,14 +1,16 @@
 //
 //  ConnecterManager.m
-//  GSDK
+//  GPSDKDemo
 //
+//  Created by max on 2020/7/22.
+//  Copyright © 2020 max. All rights reserved.
 //
 
 #import "ConnecterManager.h"
-
-@interface ConnecterManager(){
-    ConnectMethod currentConnMethod;
-}
+#define WeakSelf(type) __weak typeof(type) weak##type = type
+@interface ConnecterManager()
+@property(nonatomic,copy)ConnectDeviceState connecterState;
+@property(nonatomic,copy)UpdateState updateState;
 @end
 
 @implementation ConnecterManager
@@ -24,12 +26,59 @@ static dispatch_once_t once;
 }
 
 /**
+ *  方法说明: 更新连接状态
+ */
+-(void)updateConnectState {
+    WeakSelf(self);
+    self.connecterState = ^(ConnectState state) {
+        if (state == CONNECT_STATE_DISCONNECT) {
+            [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"deviceDisconnect" object:nil userInfo:nil]];
+            NSLog(@"发送通知。。。");
+        }
+        
+        switch (state) {
+            case CONNECT_STATE_CONNECTED:
+                NSLog(@"连接成功");
+                weakself.isConnected = YES;
+                weakself.state(state);
+                break;
+            case CONNECT_STATE_DISCONNECT:
+                //发送通知
+                NSLog(@"断开连接");
+                weakself.peripheral = nil;
+                weakself.state(state);
+                weakself.isConnected = NO;
+                weakself.type = UNKNOWN;
+                break;
+            default:
+                weakself.state(state);
+                break;
+        }
+    };
+}
+
+-(void)updateBluetoothState {
+    WeakSelf(self);
+    self.updateState = ^(NSInteger state) {
+        switch (state) {
+            case CBCentralManagerStatePoweredOff:
+                [weakself close];
+                weakself.updateCenterBluetoothState(state);
+                break;
+            default:
+                weakself.updateCenterBluetoothState(state);
+                break;
+        }
+    };
+}
+
+/**
  *  方法说明：扫描外设
  *  @param serviceUUIDs 需要发现外设的UUID，设置为nil则发现周围所有外设
  *  @param options  其它可选操作
  *  @param discover 发现的设备
  */
--(void)scanForPeripheralsWithServices:(nullable NSArray<CBUUID *> *)serviceUUIDs options:(nullable NSDictionary<NSString *, id> *)options discover:(void(^_Nullable)(CBPeripheral *_Nullable peripheral,NSDictionary<NSString *, id> *_Nullable advertisementData,NSNumber *_Nullable RSSI))discover{
+-(void)scanForPeripheralsWithServices:(nullable NSArray<CBUUID *> *)serviceUUIDs options:(nullable NSDictionary<NSString *, id> *)options discover:(void(^_Nullable)(CBPeripheral *_Nullable peripheral,NSDictionary<NSString *, id> *_Nullable advertisementData,NSNumber *_Nullable RSSI))discover {
     [_bleConnecter scanForPeripheralsWithServices:serviceUUIDs options:options discover:discover];
 }
 
@@ -38,14 +87,17 @@ static dispatch_once_t once;
  *  @param state 蓝牙状态
  */
 -(void)didUpdateState:(void(^)(NSInteger state))state {
+    self.updateCenterBluetoothState = state;
+    [self updateBluetoothState];
     if (_bleConnecter == nil) {
-        currentConnMethod = BLUETOOTH;
-        [self initConnecter:currentConnMethod];
+        self.currentConnMethod = BLUETOOTH;
+        [self initConnecter:self.currentConnMethod];
     }
-    [_bleConnecter didUpdateState:state];
+    [_bleConnecter didUpdateState:self.updateState];
 }
 
 -(void)initConnecter:(ConnectMethod)connectMethod {
+    self.isConnected = NO;
     switch (connectMethod) {
         case BLUETOOTH:
             _bleConnecter = [BLEConnecter new];
@@ -67,10 +119,14 @@ static dispatch_once_t once;
  *  连接
  */
 -(void)connectPeripheral:(CBPeripheral *)peripheral options:(nullable NSDictionary<NSString *,id> *)options timeout:(NSUInteger)timeout connectBlack:(void(^_Nullable)(ConnectState state)) connectState{
-    [_bleConnecter connectPeripheral:peripheral options:options timeout:timeout connectBlack:connectState];
+    self.peripheral = peripheral;
+    self.state = connectState;
+    [self updateConnectState];
+    [_bleConnecter connectPeripheral:peripheral options:options timeout:timeout connectBlack:self.connecterState];
 }
 
 -(void)connectPeripheral:(CBPeripheral * _Nullable)peripheral options:(nullable NSDictionary<NSString *,id> *)options {
+    self.peripheral = peripheral;
     [_bleConnecter connectPeripheral:peripheral options:options];
 }
 
@@ -81,6 +137,7 @@ static dispatch_once_t once;
 -(void)write:(NSData *)data receCallBack:(void (^)(NSData *))callBack {
 #ifdef DEBUG
     NSLog(@"[ConnecterManager] write:receCallBack:");
+    _connecter = _bleConnecter;
 #endif
     _bleConnecter.writeProgress = nil;
     [_connecter write:data receCallBack:callBack];
@@ -97,11 +154,6 @@ static dispatch_once_t once;
 -(void)close {
     if (_connecter) {
         [_connecter close];
-    }
-    switch (currentConnMethod) {
-        case BLUETOOTH:
-            _bleConnecter = nil;
-            break;
     }
 }
 
