@@ -1,5 +1,6 @@
 #import <Flutter/Flutter.h>
 #import <CoreBluetooth/CoreBluetooth.h>
+#import <GSDK/BLEConnecter.h>
 #import "ConnecterManager.h"
 
 #define NAMESPACE @"bluetooth_print"
