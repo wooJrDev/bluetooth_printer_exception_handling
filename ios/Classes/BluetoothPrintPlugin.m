@@ -25,9 +25,8 @@
   // STATE
   BluetoothPrintStreamHandler* stateStreamHandler = [[BluetoothPrintStreamHandler alloc] init];
   [stateChannel setStreamHandler:stateStreamHandler];
-  instance.stateStreamHandler = stateStreamHandler;
-
-  [registrar addMethodCallDelegate:instance channel:channel];
+    instance.stateStreamHandler = stateStreamHandler;
+    [registrar addMethodCallDelegate:instance channel:channel];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -73,7 +72,6 @@
       } else {
           [self startScan];
       }
-      
     result(nil);
   } else if([@"stopScan" isEqualToString:call.method]) {
     [Manager stopScan];
@@ -102,7 +100,6 @@
     }
   } else if([@"print" isEqualToString:call.method]) {
      @try {
-       
        result(nil);
      } @catch(FlutterError *e) {
        result(e);
@@ -125,7 +122,6 @@
      }
   }else if([@"printTest" isEqualToString:call.method]) {
      @try {
-       
        result(nil);
      } @catch(FlutterError *e) {
        result(e);

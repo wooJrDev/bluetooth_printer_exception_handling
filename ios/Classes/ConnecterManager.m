@@ -137,8 +137,8 @@ static dispatch_once_t once;
 -(void)write:(NSData *)data receCallBack:(void (^)(NSData *))callBack {
 #ifdef DEBUG
     NSLog(@"[ConnecterManager] write:receCallBack:");
-    _connecter = _bleConnecter;
 #endif
+    _connecter = _bleConnecter;
     _bleConnecter.writeProgress = nil;
     [_connecter write:data receCallBack:callBack];
 }
